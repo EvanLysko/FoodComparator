@@ -4,7 +4,7 @@
 make a server that will compare food prices at grocery stores around a given location
 
 # inputs
-food item
+food item,
 location
 
 ## Roadmap
