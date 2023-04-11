@@ -1,34 +1,9 @@
-import googlemaps
 import json
+import time
+import googleMapsPlacesRequests as gPlaces
+import googleMapsGeocodingRequests as gGeocode
 
-#TODO the googlemaps library is causing issues when requesting with next_page_token but the links generated work. So fuck the libary and just use your own requests
-
-gmaps = googlemaps.Client(key = "AIzaSyD6XC9bqblOB1b0UdXo88jGUX0qT2Jwd4Q")
-
-page_count = 0
-next_page_token = None
-location = "pittsburgh, pa"
-places = []
-
-while page_count < 5:
-    if next_page_token:
-        results = gmaps.places(query = "grocery stores " + location, page_token = next_page_token)
-    else:
-        results = gmaps.places(query = "grocery stores " + location)
-
-        
-
-    #check status
-    if results["status"] != "OK":
-        print("PLACES REQUEST ERROR")
-        continue
-    
-    next_page_token = results["next_page_token"]
-    
-    results = results["results"]
-    places = places+ results
-    page_count += 1
-    print(next_page_token)
+# print(places)
     
 
 # each place has:
@@ -71,68 +46,150 @@ while page_count < 5:
 # plus_code
 # reference
 
-print(len(places))
 
 def _shouldKeepInList(place):
     """checks if place["business_status"] is OPERATIONAL
     """
     return place["business_status"] == "OPERATIONAL"
 
-#get rid of all non-operational places
-places[:] = [tup for tup in places if _shouldKeepInList(tup)]
+
+def _getOnlyOperational(places):
+    places[:] = [tup for tup in places if _shouldKeepInList(tup)]
+    return places
 
 
-for place in places:
-    try:
-        del place["geometry"]
-    except:
-        pass
+def _getWithoutUselessInfo(places):
     
-    try:
-        del place["business_status"]
-    except:
-        pass
-    
-    try:
-        del place["icon"]
-    except:
-        pass
-    
-    try:
-        del place["icon_background_color"]
-    except:
-        pass
-    
-    try:
-        del place["icon_mask_base_uri"]
-    except:
-        pass
-    
-    try:
-        del place["photos"]
-    except:
-        pass
-    
-    try:
-        del place["plus_code"]
-    except:
-        pass
-    
-    try:
-        del place["reference"]
-    except:
-        pass
+    for place in places:
+        try:
+            del place["geometry"]
+        except:
+            pass
         
+        try:
+            del place["business_status"]
+        except:
+            pass
+        
+        try:
+            del place["icon"]
+        except:
+            pass
+        
+        try:
+            del place["icon_background_color"]
+        except:
+            pass
+        
+        try:
+            del place["icon_mask_base_uri"]
+        except:
+            pass
+        
+        try:
+            del place["photos"]
+        except:
+            pass
+        
+        try:
+            del place["plus_code"]
+        except:
+            pass
+        
+        try:
+            del place["reference"]
+        except:
+            pass
+    return places      
 
 
-# print(len(places))
+def _getWithoutDuplicateNames(places):
+    names = []
+    res = []
+    for place in places:
+        if place["name"] not in names:
+            names.append(place["name"])
+            res.append(place)
+        
+    return res
 
-# for place in places:
-#     for key in place:
-#         print(key)
-#     break;
+def _getLocalGroceryStores():
+    zip_code = "15226"
+    page_count = 0
+    next_page_token = None
+    location = "pittsburgh pa"
+    radius = "50000";
+    places = []
+
+    geocode_results = gGeocode.get(zip_code)
+
+    if geocode_results["status"] != "OK":
+        print("GEOCODE REQUEST ERROR: " + geocode_results["status"])
+            
+            
+    latlng = str(geocode_results["results"][0]["geometry"]["location"]["lat"]) + "," + str(geocode_results["results"][0]["geometry"]["location"]["lng"])
+    print(latlng)
+
+
+    while page_count < 2:
+        if next_page_token is None:
+            results = gPlaces.get("query=" + "grocery stores" + "&location=" + latlng +"&radius=" + radius)
+        else:
+            results = gPlaces.get("pagetoken=" + next_page_token)
+
+        #check status
+        if results["status"] != "OK":
+            print("PLACES REQUEST ERROR: " + results["status"])
+            break
+        
+        try:
+            next_page_token = results["next_page_token"]
+        except:
+            next_page_token = None
+            
+        if next_page_token is None or next_page_token == "":
+            page_count = 10000
+        
+        results = results["results"]
+        places = places + results
+        page_count += 1
+        print(len(places))
+        time.sleep(5)
+
+    places = _getWithoutDuplicateNames(places)
+    places = _getOnlyOperational(places)
+    places = _getWithoutUselessInfo(places)
+
+
+    for place in places:
+        print(place["name"])
+        
+def _getPopularGroceryStores():
+    zip_code = "15226"
+    page_count = 0
+    next_page_token = None
+    radius = "50000";
+    places = []
+
+    geocode_results = gGeocode.get(zip_code)
+
+    if geocode_results["status"] != "OK":
+        print("GEOCODE REQUEST ERROR: " + geocode_results["status"])
+            
+            
+    latlng = str(geocode_results["results"][0]["geometry"]["location"]["lat"]) + "," + str(geocode_results["results"][0]["geometry"]["location"]["lng"])
+    print(latlng)
+
+
     
-    
-# for place in places["results"]:
-    # print(place["name"])
-    
+
+    places = _getWithoutDuplicateNames(places)
+    places = _getOnlyOperational(places)
+    places = _getWithoutUselessInfo(places)
+
+
+    for place in places:
+        print(place["name"])
+
+_getLocalGroceryStores()
+
