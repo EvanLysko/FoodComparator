@@ -13,5 +13,6 @@ location
 * Obtain useful info about places on api including their url/websites, address, hours of operation, crowd-level etc
 * Make webscraping modules for most popular grocery stores first
 * gather prices of searched item
+* have diffent ways to get price and list the method when price is finally listed
 * display to user
-* eventually make it a database that auto updates every day with the most commonly searched items at most popular stores cached
+* eventually make it a database that auto updates and caches data
