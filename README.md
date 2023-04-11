@@ -8,8 +8,9 @@ food item,
 location
 
 ## Roadmap
-* Get places from google maps api (100 for now)
-* Obtain useful info about places on api including their url/websites
+* Get places from google maps api (set of 60 results)
+* Check for popular grocery store chains and or other grocery store search types nearby to get locations like walmart, costco, etc to pop up
+* Obtain useful info about places on api including their url/websites, address, hours of operation, crowd-level etc
 * Make webscraping modules for most popular grocery stores first
 * gather prices of searched item
 * display to user
