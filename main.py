@@ -3,6 +3,8 @@ import time
 import googleMapsPlacesRequests as gPlaces
 import googleMapsGeocodingRequests as gGeocode
 
+#TODO get links for places
+
 # print(places)
     
 
@@ -107,17 +109,24 @@ def _getWithoutDuplicateNames(places):
     names = []
     res = []
     for place in places:
+        try:
+            place["name"]
+        except:
+            continue
+        
         if place["name"] not in names:
             names.append(place["name"])
             res.append(place)
         
     return res
 
-def _getLocalGroceryStores():
-    zip_code = "15226"
+places_search_strings = ["grocery store", "supermarket", "walmart", "wholesale grocery", "membership retail food", "food store", "retail food store"]
+zip_code = "15226"
+
+
+def _getPlacesFromSearchString(places_search_string, zip_code):
     page_count = 0
     next_page_token = None
-    location = "pittsburgh pa"
     radius = "50000";
     places = []
 
@@ -128,12 +137,12 @@ def _getLocalGroceryStores():
             
             
     latlng = str(geocode_results["results"][0]["geometry"]["location"]["lat"]) + "," + str(geocode_results["results"][0]["geometry"]["location"]["lng"])
-    print(latlng)
+    # print(latlng)
 
 
-    while page_count < 2:
+    while page_count < 3:
         if next_page_token is None:
-            results = gPlaces.get("query=" + "grocery stores" + "&location=" + latlng +"&radius=" + radius)
+            results = gPlaces.get("query=" + places_search_string + "&location=" + latlng +"&radius=" + radius)
         else:
             results = gPlaces.get("pagetoken=" + next_page_token)
 
@@ -153,43 +162,36 @@ def _getLocalGroceryStores():
         results = results["results"]
         places = places + results
         page_count += 1
-        print(len(places))
+        # print(len(places))
         time.sleep(5)
 
     places = _getWithoutDuplicateNames(places)
     places = _getOnlyOperational(places)
     places = _getWithoutUselessInfo(places)
 
-
+    return places
+    # for place in places:
+    #     print(place["name"])
+    
+def getPlaces(zip_code):
+    
+    if zip_code is not str:
+        zip_code  = str(zip_code)
+    
+    places = []
+    for place_search_string in places_search_strings:
+        places = places + _getPlacesFromSearchString(place_search_string, zip_code)
+        
+    places = _getWithoutDuplicateNames(places)
+    
     for place in places:
         print(place["name"])
         
-def _getPopularGroceryStores():
-    zip_code = "15226"
-    page_count = 0
-    next_page_token = None
-    radius = "50000";
-    places = []
-
-    geocode_results = gGeocode.get(zip_code)
-
-    if geocode_results["status"] != "OK":
-        print("GEOCODE REQUEST ERROR: " + geocode_results["status"])
-            
-            
-    latlng = str(geocode_results["results"][0]["geometry"]["location"]["lat"]) + "," + str(geocode_results["results"][0]["geometry"]["location"]["lng"])
-    print(latlng)
-
-
+    print(len(places))
+    print(places)
     
+    return places
+        
 
-    places = _getWithoutDuplicateNames(places)
-    places = _getOnlyOperational(places)
-    places = _getWithoutUselessInfo(places)
-
-
-    for place in places:
-        print(place["name"])
-
-_getLocalGroceryStores()
+getPlaces(15226)
 
