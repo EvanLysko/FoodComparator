@@ -2,6 +2,8 @@ import json
 import time
 import googleMapsPlacesRequests as gPlaces
 import googleMapsGeocodingRequests as gGeocode
+import googleMapsDetailsRequests as gDetails
+import pandas as pd
 
 #TODO get links for places
 
@@ -120,6 +122,8 @@ def _getWithoutDuplicateNames(places):
         
     return res
 
+
+# places_search_strings = ["grocery store"]
 places_search_strings = ["grocery store", "supermarket", "walmart", "wholesale grocery", "membership retail food", "food store", "retail food store"]
 zip_code = "15226"
 
@@ -163,11 +167,14 @@ def _getPlacesFromSearchString(places_search_string, zip_code):
         places = places + results
         page_count += 1
         # print(len(places))
-        time.sleep(5)
+        time.sleep(3)
 
     places = _getWithoutDuplicateNames(places)
     places = _getOnlyOperational(places)
     places = _getWithoutUselessInfo(places)
+    
+    # for place in places:
+    #     print(place)
 
     return places
     # for place in places:
@@ -191,7 +198,28 @@ def getPlaces(zip_code):
     print(places)
     
     return places
+
+def getLinks(places):
+
+    res = []
+    for place in places:
+        try:
+            place["website"] = gDetails.get("place_id=" + place["place_id"])["result"]["website"]
+            res.append(place)
+        except:
+            print("no website for " + place["name"])
+        time.sleep(1)
+        
+    return res
         
 
-getPlaces(15226)
+def toCSV(places):
+    df = pd.DataFrame.from_dict(places)
+    df.to_csv("places.csv")
+           
+        
+        
+        
+
+toCSV(getLinks(getPlaces(15226)))
 
