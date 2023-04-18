@@ -1,0 +1,24 @@
+
+search_url = https://www.walmart.com/search?q={item}&facet=fulfillment_method%3APickup&sort=best_seller
+
+
+item div xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div
+
+img with alt and src xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[1]/div[2]/div[1]/img
+
+item price div xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[1]/div[1]
+
+item price per unit xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[1]/div[2]
+
+item name xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/span/span
+
+rating xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[2]/span[3]
+
+review_count xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[2]/span[2]
+
+ebt eligible xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[3]/span
+
+pickup xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[6]/span[2]
+
+delivery xpath: //*[@id="maincontent"]/main/div/div[2]/div/div/div[1]/div[2]/div[1]/section/div/div[1]/div/div/div/div[2]/div[6]/span[3]
+
